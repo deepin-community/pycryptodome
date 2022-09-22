@@ -1,0 +1,22 @@
+From: Stefano Rivera <stefanor@debian.org>
+Date: Mon, 15 Nov 2021 22:48:53 -0800
+Subject: The final argument to mont_select() is a size_t
+
+Forwarded: https://github.com/Legrandin/pycryptodome/pull/576
+---
+ src/test/test_mont.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/test_mont.c b/src/test/test_mont.c
+index 544cc13..71b4baf 100644
+--- a/src/test/test_mont.c
++++ b/src/test/test_mont.c
+@@ -5,7 +5,7 @@
+ int ge(const uint64_t *x, const uint64_t *y, size_t nw);
+ unsigned sub(uint64_t *out, const uint64_t *a, const uint64_t *b, size_t nw);
+ void rsquare(uint64_t *r2, uint64_t *n, size_t nw);
+-int mont_select(uint64_t *out, const uint64_t *a, const uint64_t *b, unsigned cond, unsigned words);
++int mont_select(uint64_t *out, const uint64_t *a, const uint64_t *b, unsigned cond, size_t words);
+ 
+ void test_ge(void)
+ {

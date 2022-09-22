@@ -1,0 +1,23 @@
+From: Christopher Hoskin <mans0954@debian.org>
+Date: Sat, 4 Nov 2017 09:45:16 +0000
+Subject: Suppress privacy violations
+
+(by default) sphinx.ext.mathjax uses mathjax online (from cdnjs) to
+display math; imgmath generates static images.
+---
+ Doc/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Doc/conf.py b/Doc/conf.py
+index a0fe440..a943372 100644
+--- a/Doc/conf.py
++++ b/Doc/conf.py
+@@ -45,7 +45,7 @@ _raw_api.load_pycryptodome_raw_lib = lambda name, cdec: MockLib()
+ # Add any Sphinx extension module names here, as strings. They can be extensions
+ # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+ extensions = [ 'sphinx.ext.autodoc', 'sphinx.ext.napoleon',
+-        'sphinx.ext.mathjax' ]
++        'sphinx.ext.imgmath' ]
+ 
+ # Add any paths that contain templates here, relative to this directory.
+ templates_path = ['_templates']

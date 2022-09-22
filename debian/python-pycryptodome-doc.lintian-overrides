@@ -1,0 +1,4 @@
+# File patched to point to debian/copyright file
+# N.B. by default the Sphinx HTML builder copies the RST source files to the
+# build folder so they can be used for searching
+python-pycryptodome-doc: extra-license-file usr/share/doc/python-pycryptodome-doc/html/_sources/src/license.rst.txt

@@ -1,0 +1,3 @@
+*.egg-info/*
+.separate_namespace
+lib/Cryptodome/

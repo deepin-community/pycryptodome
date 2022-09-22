@@ -1,0 +1,35 @@
+From: Christopher Hoskin <mans0954@debian.org>
+Date: Wed, 7 Jun 2017 20:43:23 +0100
+Subject: * Use debian copyright file for licenses
+
+Origin: upstream, https://github.com/Legrandin/pycryptodome/commit/05eb116ee1effcc39312121386eb047772925d62
+Bug: https://github.com/Legrandin/pycryptodome/issues/73
+Last-Update: 2021-10-25
+---
+ Doc/src/license.rst | 3 ++-
+ README.rst          | 3 ---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Doc/src/license.rst b/Doc/src/license.rst
+index 25acf59..9a492fa 100644
+--- a/Doc/src/license.rst
++++ b/Doc/src/license.rst
+@@ -1,5 +1,6 @@
+ License
+ -------
+ 
+-.. include:: ../../LICENSE.rst
++`Copyright <../../copyright>`_
++
+ 
+diff --git a/README.rst b/README.rst
+index fe84c77..ba85671 100644
+--- a/README.rst
++++ b/README.rst
+@@ -1,6 +1,3 @@
+-.. image:: https://github.com/Legrandin/pycryptodome/workflows/Integration%20test/badge.svg?branch=master
+-   :target: https://github.com/Legrandin/pycryptodome/actions
+-
+ PyCryptodome
+ ============
+ 

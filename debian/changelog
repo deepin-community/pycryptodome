@@ -1,0 +1,142 @@
+pycryptodome (3.11.0+dfsg1-2) unstable; urgency=medium
+
+  * Team upload.
+  * Patch: Correct types in mont_select() declaration in C tests.
+
+ -- Stefano Rivera <stefanor@debian.org>  Mon, 15 Nov 2021 22:50:40 -0800
+
+pycryptodome (3.11.0+dfsg1-1) unstable; urgency=medium
+
+  * Team upload.
+  [ Ondřej Nový ]
+  * d/control: Update Maintainer field with new Debian Python Team
+    contact address.
+  * d/control: Update Vcs-* fields with new Debian Python Team Salsa
+    layout.
+
+  [ Debian Janitor ]
+  * Use secure URI in Homepage field.
+  * Update renamed lintian tag names in lintian overrides.
+  * Remove obsolete field Name from debian/upstream/metadata,
+    already present in machine-readable debian/copyright.
+
+  [ Håvard Flaget Aasen ]
+  * New upstream version 3.11.0+dfsg1 Closes: #998094
+  * Rebase patches
+  * Mark autopkgtest as superficial. Closes: #974462
+  * Patch to add compatibility with sphinx >= 4.0 Closes: #997733
+  * Update lintian-overrides, use wildcard and capitalize word.
+  * d/upstream/metadata: Remove registration link to GitHub.
+  * d/changelog: Fix spelling mistake.
+  * d/control:
+    - Update Standards-Version to 4.6.0
+    - Update the long description.
+  * d/rules: Remove deleting of files. These files are no longer
+    shipped with source from PyPI.
+  * d/copyright: Update files and copyright year.
+
+  [ Stefano Rivera ]
+  * Remove noop proxy exports from debian/rules. pybuild automatically exports
+    them, anyway.
+  * Replace superficial autopkgtest with autodep8 configuration.
+  * Add an autopkgtest to run the full test suite.
+  * Run C test suite at build time:
+    - Patch: Allow specifying the python binary for C tests.
+    - Patch: Avoid creating a 0-length array during tests.
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Sun, 14 Nov 2021 01:50:58 +0100
+
+pycryptodome (3.9.7+dfsg1-1) unstable; urgency=medium
+
+  [ Emmanuel Arias ]
+  * Team upload.
+  * New upstream version 3.9.7 (Closes: #956046).
+  * d/contol: debhelper-compat to 13 (from 11),
+  * d/control: Bump Standards-Version to 4.5.0 (no changes).
+  * d/gbp.conf: Set debian/master as default branch.
+  * d/salsa-ci.yml: enable salsa-ci.
+  * Remove patch that has been upstreamed 0003-Fix-syntax-error.patch
+  * d/control: declare Rules-Requires-Root: no
+
+  [ Henry-Nicolas Tourneur ]
+  * d/rules: leverage debhelper-compat 13 by using execute_after and _before
+    Replace override statements, PYBUILD_BEFORE_BUILD and PYBUILD_AFTER_INSTALL
+  * d/copyright: cleanup files field paths.
+  * d/copyright: update to reflect new upstream version.
+  * Remove patch no longer used for oldstable: 2000-backport-to-stretch.patch
+  * Exclude from upstream tarball prebuilt static js sphinx theme files.
+  * Remove README files of SelfTest that are installed under /usr/lib/python
+
+ -- Johannes 'josch' Schauer <josch@debian.org>  Thu, 14 May 2020 21:03:10 +0200
+
+pycryptodome (3.6.1-3) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * Convert git repository from git-dpm to gbp layout
+  * Use 'python3 -m sphinx' instead of sphinx-build for building docs
+  * Use debhelper-compat instead of debian/compat.
+
+  [ Sandro Tosi ]
+  * Drop python2 support; Closes: #937412
+
+ -- Sandro Tosi <morph@debian.org>  Sat, 21 Mar 2020 12:52:46 -0400
+
+pycryptodome (3.6.1-2) unstable; urgency=medium
+
+  * Bump Standards-Version from 4.1.3 to 4.1.4.
+  * Refresh 0003-Fix-syntax-error.patch.
+  * Updated 2000-backport-to-stretch.patch with more changes needed in Stretch.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Tue, 12 Jun 2018 12:04:57 +0200
+
+pycryptodome (3.6.1-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/tests: Use AUTOPKGTEST_TMP instead of ADTTMP
+
+  [ Petter Reinholdtsen ]
+  * New upstream release 3.6.1.
+    - Solve build problem on 32 bits big endian archs (Closes: #892175).
+  * Ran wrap-and-sort.
+  * Add d/gbp.conf to enforce the use of pristine-tar.
+  * Added 2000-backport-to-stretch.patch documenting a way to backport
+    to Debian Stretch.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Tue, 12 Jun 2018 08:22:26 +0000
+
+pycryptodome (3.4.11-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/control: Set Vcs-* to salsa.debian.org
+
+  [ Christopher Hoskin ]
+  * Fix "CVE-2018-6594" Resolved by upstream in 3.4.10 (Closes:
+    #889998)
+  * Add upstream metadata file
+  * Add 0003-Fix-syntax-error.patch
+  * Add lib/Cryptodome/ to clean
+  * Bump debhelper compat from 9 to 11
+  * Keep the documentation in python-pycryptodome-doc (for now at least)
+  * Bump Standards-Version from 4.1.1 to 4.1.3 (no change required)
+
+ -- Christopher Hoskin <mans0954@debian.org>  Tue, 06 Mar 2018 07:02:32 +0000
+
+pycryptodome (3.4.7-1) unstable; urgency=medium
+
+  * New upstream release (3.4.7)
+  * Use secure URI in debian/watch
+  * Remove new-package-should-not-package-python2-module lintian override
+  * Update extra-license-file lintian override (Sphinx now appears to create a
+    copy of the source file with extension rst.txt)
+  * Bump Standards-Version from 3.9.8 to 4.1.1 (no change required)
+  * Add missing build dependency on python3-sphinx-rtd-theme
+
+ -- Christopher Hoskin <mans0954@debian.org>  Sat, 04 Nov 2017 10:24:18 +0000
+
+pycryptodome (3.4.6-1) unstable; urgency=low
+
+  * source package automatically created by stdeb 0.8.5
+  * Initial release. (Closes: #864294: ITP: pycryptodome --
+    cryptographic library for Python)
+
+ -- Christopher Hoskin <mans0954@debian.org>  Sun, 11 Jun 2017 20:51:56 +0100

@@ -1,0 +1,6 @@
+0001-Fix-Documentation.patch
+0002-Suppress-privacy-violations.patch
+0003-sphinx-compatibility.patch
+0004-Permit-easy-selection-of-a-python-binary-in-the-C-te.patch
+0005-C-Tests-Avoid-creating-a-0-length-array.patch
+0006-The-final-argument-to-mont_select-is-a-size_t.patch

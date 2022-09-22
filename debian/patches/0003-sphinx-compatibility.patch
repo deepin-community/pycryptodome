@@ -1,0 +1,32 @@
+From: Håvard Flaget Aasen <haavard_aasen@yahoo.no>
+Date: Mon, 25 Oct 2021 07:29:37 +0200
+Subject: sphinx compatibility
+
+Forwarded: https://github.com/Legrandin/pycryptodome/pull/564
+Bug-Debian: https://bugs.debian.org/997733
+---
+ Doc/conf.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Doc/conf.py b/Doc/conf.py
+index a943372..932cc97 100644
+--- a/Doc/conf.py
++++ b/Doc/conf.py
+@@ -15,7 +15,7 @@ import sys, os
+ 
+ # Modules to document with autodoc are in another directory
+ sys.path.insert(0, os.path.abspath('../lib'))
+-print sys.path
++print(sys.path)
+ 
+ # Mock existence of native modules
+ from Crypto.Util import _raw_api
+@@ -155,7 +155,7 @@ html_static_path = ['_static']
+ # Ensure that text wrapping works in a table, by overring some CSS.
+ # See https://github.com/rtfd/sphinx_rtd_theme/issues/117
+ def setup(app):
+-    app.add_stylesheet('theme_overrides.css')
++    app.add_css_file('theme_overrides.css')
+ 
+ # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
+ # using the given strftime format.

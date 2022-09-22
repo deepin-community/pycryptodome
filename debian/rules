@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+export PYBUILD_NAME=pycryptodome
+
+%:
+	dh $@ --with python3,sphinxdoc --buildsystem=pybuild
+
+override_dh_auto_test:
+	PYBUILD_SYSTEM=custom \
+        PYBUILD_TEST_ARGS="python{version} -m Cryptodome.SelfTest {build_dir}/" dh_auto_test
+	$(MAKE) -C src/test PYTHON=python3
+
+execute_before_dh_auto_build:
+	touch .separate_namespace
+
+execute_after_dh_auto_build:
+	PYTHONPATH=. python3 -m sphinx -N -bhtml Doc/ build/html # HTML generator
+	PYTHONPATH=. python3 -m sphinx -N -bman Doc/ build/man # Manpage generator
+
+# Do this until it becomes clearer where documentation should live post Python 2
+override_dh_installdocs:
+	dh_installdocs -p python3-pycryptodome
+	dh_installdocs --doc-main-package=python-pycryptodome-doc -p python-pycryptodome-doc

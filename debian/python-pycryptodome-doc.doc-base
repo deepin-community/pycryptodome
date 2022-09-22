@@ -1,0 +1,9 @@
+Document: pycryptodome
+Title: pycryptodome documentation
+Author: Legrandin <helderijs@gmail.com>
+Abstract: How to use the pycryptodome cryptographic Python library
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-pycryptodome-doc/html/index.html
+Files: /usr/share/doc/python-pycryptodome-doc/html/*.html
