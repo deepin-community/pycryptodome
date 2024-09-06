@@ -68,7 +68,6 @@ Files: lib/Crypto/Cipher/ChaCha20.py
  lib/Crypto/SelfTest/IO/*
  lib/Crypto/SelfTest/Math/*
  lib/Crypto/SelfTest/Protocol/test_SecretSharing.py
- lib/Crypto/SelfTest/PublicKey/test_ECC.py
  lib/Crypto/SelfTest/PublicKey/test_import_ECC.py
  lib/Crypto/SelfTest/Signature/test_dss.py
  lib/Crypto/SelfTest/Signature/test_pkcs1_15.py
@@ -121,6 +120,7 @@ License: BSD-2-clause
 
 Files: debian/*
 Copyright: 2017 Christopher Hoskin <mans0954@debian.org>
+           2023 Ileana Dumitrescu <ileanadumitrescu95@gmail.com>
 License: BSD-2-clause
 
 License: public-domain

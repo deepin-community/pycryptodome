@@ -1,3 +1,94 @@
+pycryptodome (3.20.0+dfsg-3) unstable; urgency=medium
+
+  [ YOKOTA Hiroshi ]
+  * Add fixups for FTBFS patch
+  * Lintian fix: debian-changelog-line-too-long
+
+ -- Antonio Terceiro <terceiro@debian.org>  Wed, 04 Sep 2024 19:08:03 -0300
+
+pycryptodome (3.20.0+dfsg-2) unstable; urgency=medium
+
+  [ YOKOTA Hiroshi ]
+  * Rediff patches
+  * Fix wired sanitizer usage
+  * Use VERBOSE environment variable to display build commands while in
+    CMake builder
+  * Some architecture requires additional library (Closes: #1069534)
+  * Test suite uses CMake to build
+  * Refactor CMake usage
+  * Use Debian architecture name for architecture-specific options
+  * Enable sanitizer option only for supported architecture (Closes: #1072992)
+  * Clean CMake project files (Closes: #1045521)
+  * Don't remove a license file even if the file name has "*.orig" extension
+  * Add link to bug tracker
+
+ -- Antonio Terceiro <terceiro@debian.org>  Tue, 06 Aug 2024 06:42:59 -0300
+
+pycryptodome (3.20.0+dfsg-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release (Closes: #1056436)
+    - C unit tests also run on non-x86 architectures
+      (Closes: #1053328, LP: #2039968)
+  * Drop patches applied upstream
+
+ -- Benjamin Drung <bdrung@debian.org>  Thu, 11 Jan 2024 14:32:40 +0100
+
+pycryptodome (3.18.0+dfsg1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+  * d/watch:
+    - Pull fron github repo instead of pypi.debian.net
+    - Verify signature with uscan
+  * d/rules:
+    - Update to build src/test files with cmake
+    - Update dh_auto_test to run for all supported python versions
+  * d/control:
+    - Add cmake to Build-Depends
+    - Bump standards version to 4.6.2 from 4.6.1
+  * d/copyright:
+    - Update copyright year to 2023 for debian/* files
+    - Add myself to copyright for debian/* files
+  * d/tests/unittests:
+    - Correct py3versions from -r option to -s
+    - Remove redirection to /dev/null
+  * d/patches/: Update existing patches
+    - Update 0001-Fix-Documentation.patch
+      + Additional images to remove
+    - Remove 0003-sphinx-compatibility.patch
+      + Fixed in upstream
+    - Remove 0004-Permit-easy-selection-of-a-python-binary-in-the-C-te.patch
+      + Makefile no longer exists
+    - Remove 0005-C-Tests-Avoid-creating-a-0-length-array
+      + Fixed in upstream
+    - Rename 0006-The-final-argument-to-mont_select-is-a-size_t.patch to
+      0003-The-final-argument-to-mod_select-is-a-size_t.patch
+      + Function renamed, type error still exists, updated Forwarded
+  * d/source/lintian-overrides:
+    - Override long line lengths
+    - Override unnecessary check for DEB_BUILD_OPTIONS
+  * d/upstream/metadata:
+    - Update Archive from Pypi to Github
+
+ -- Ileana Dumitrescu <ileanadumitrescu95@gmail.com>  Mon, 10 Jul 2023 19:53:57 +0300
+
+pycryptodome (3.11.0+dfsg1-4) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Update lintian override info to new format: + debian/python3-pycryptodome.lintian-overrides: line 5-6 + debian/python-pycryptodome-doc.lintian-overrides: line 4
+  * Update standards version to 4.6.1, no changes needed.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Wed, 16 Nov 2022 10:11:04 +0000
+
+pycryptodome (3.11.0+dfsg1-3) unstable; urgency=medium
+
+  * Team upload.
+  * Limit the autopkgtest dependencies to just the module package, fixing test
+    failure on i386 in Ubuntu.
+
+ -- Stefano Rivera <stefanor@debian.org>  Fri, 26 Nov 2021 11:13:48 -0400
+
 pycryptodome (3.11.0+dfsg1-2) unstable; urgency=medium
 
   * Team upload.

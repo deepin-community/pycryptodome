@@ -13,7 +13,7 @@ def make_test(secret):
     m_out = [ "0x%08xUL" % x for x in split ]
 
     print("")
-    print("void test_%d() {" % next(counter))
+    print("void test_%d(void) {" % next(counter))
     print("    uint8_t secret[%d] = {" % len(secret), end=' ')
     print(",".join([str(x) for x in secret]) + "};")
     print("    uint32_t m[5] = { 0 };")
@@ -35,7 +35,7 @@ print("#include <stdio.h>")
 print()
 print("void poly1305_load_m(uint32_t r[5], const uint8_t data[], size_t len);")
 
-for len_secret in range(16+1):
+for len_secret in range(1, 16+1):
     make_test(b"\xaa" * len_secret)
 make_test(b"\xcc" * 16)
 make_test(b"\xff" * 16)

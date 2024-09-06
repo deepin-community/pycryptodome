@@ -3,16 +3,23 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
+include /usr/share/dpkg/architecture.mk
 
 export PYBUILD_NAME=pycryptodome
+export VERBOSE=1
+
+CMAKE_CFLAGS   = ${CFLAGS}   ${CPPFLAGS}
+CMAKE_CXXFLAGS = ${CXXFLAGS} ${CPPFLAGS}
 
 %:
 	dh $@ --with python3,sphinxdoc --buildsystem=pybuild
 
 override_dh_auto_test:
-	PYBUILD_SYSTEM=custom \
-        PYBUILD_TEST_ARGS="python{version} -m Cryptodome.SelfTest {build_dir}/" dh_auto_test
-	$(MAKE) -C src/test PYTHON=python3
+	for PY3VER in $(shell py3versions -sv); do \
+		PYBUILD_SYSTEM=custom \
+			PYBUILD_TEST_ARGS="python$$PY3VER -m Cryptodome.SelfTest {build_dir}/" dh_auto_test; \
+	done
+	cd src/test && PYTHON=python3 CFLAGS="${CMAKE_CFLAGS}" CXXFLAGS="${CMAKE_CXXFLAGS}" cmake -DDEB_HOST_ARCH=${DEB_HOST_ARCH} ./ && $(MAKE)
 
 execute_before_dh_auto_build:
 	touch .separate_namespace
@@ -25,3 +32,11 @@ execute_after_dh_auto_build:
 override_dh_installdocs:
 	dh_installdocs -p python3-pycryptodome
 	dh_installdocs --doc-main-package=python-pycryptodome-doc -p python-pycryptodome-doc
+
+execute_after_dh_auto_clean:
+	if [ -f src/test/Makefile ] ; then \
+		$(MAKE) -C src/test clean ; \
+	fi
+
+override_dh_clean:
+	dh_clean --exclude=Doc/LEGAL/copy/LICENSE.orig

@@ -3,13 +3,14 @@ Maintainer: Debian Python Team <team+python@tracker.debian.org>
 Uploaders: Christopher Hoskin <mans0954@debian.org>
 Section: python
 Priority: optional
-Build-Depends: debhelper-compat (= 13),
+Build-Depends: cmake,
+               debhelper-compat (= 13),
                dh-python,
                python3-all-dev,
                python3-setuptools,
                python3-sphinx <!nodoc>,
                python3-sphinx-rtd-theme <!nodoc>,
-Standards-Version: 4.6.0
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Homepage: https://www.pycryptodome.org
 Vcs-Git: https://salsa.debian.org/python-team/packages/pycryptodome.git

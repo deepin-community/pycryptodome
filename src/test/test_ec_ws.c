@@ -80,7 +80,10 @@ void test_ec_projective_to_affine(void)
 {
     Workplace *wp;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint64_t *x, *y, *z;
     uint8_t buffer[32];
     uint64_t zero[4] = { 0 };
@@ -118,7 +121,10 @@ void test_ec_full_double(void)
 {
     Workplace *wp;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint64_t *x, *y, *z;
     uint64_t *b;
     uint8_t buffer[32];
@@ -169,11 +175,14 @@ void test_ec_full_double(void)
     mont_context_free(ctx);
 }
 
-void test_ec_mix_add(void)
+void test_ec_mix_add_1(void)
 {
     Workplace *wp;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint64_t *x1, *y1, *z1;
     uint64_t *x2, *y2;
     uint64_t *b;
@@ -210,9 +219,40 @@ void test_ec_mix_add(void)
     mont_to_bytes(buffer, 32, z1, ctx);
     assert(0 == memcmp(buffer, "\x7f\x3f\xac\x7e\x49\x3e\x61\x4b\x52\xd8\x49\x31\x8b\x57\xa7\xec\x89\x50\x27\xdb\x75\xbe\xa6\x61\x3c\x54\x42\x89\xb3\x9f\x31\x46", 32));
 
+    free(x1);
+    free(y1);
+    free(z1);
+    free(x2);
+    free(y2);
+
+    free(b);
+    free_workplace(wp);
+    mont_context_free(ctx);
+}
+
+void test_ec_mix_add_2(void)
+{
+    Workplace *wp;
+    MontContext *ctx;
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint64_t *x1, *y1, *z1;
+    uint64_t *x2, *y2;
+    uint64_t *b;
+    uint8_t buffer[32];
+
+    mont_context_init(&ctx, modulus, sizeof(modulus));
+    wp = new_workplace(ctx);
+    mont_from_bytes(&b, (uint8_t*)"\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b", 32, ctx);
+
     /* Projective input point is point-at-infinity */
+    mont_number(&x1, 1, ctx);
     mont_set(x1, 0, ctx);
+    mont_number(&y1, 1, ctx);
     mont_set(y1, 1, ctx);
+    mont_number(&z1, 1, ctx);
     mont_set(z1, 0, ctx);
 
     mont_from_bytes(&x2, (uint8_t*)"\xf2\x49\x10\x4d\x0e\x6f\x8f\x29\xe6\x01\x62\x77\x78\x0c\xda\x84\xdc\x84\xb8\x3b\xc3\xd8\x99\xdf\xb7\x36\xca\x08\x31\xfb\xe8\xcf", 32, ctx);
@@ -225,6 +265,79 @@ void test_ec_mix_add(void)
     assert(0 == memcmp(buffer, (uint8_t*)"\xf2\x49\x10\x4d\x0e\x6f\x8f\x29\xe6\x01\x62\x77\x78\x0c\xda\x84\xdc\x84\xb8\x3b\xc3\xd8\x99\xdf\xb7\x36\xca\x08\x31\xfb\xe8\xcf", 32));
     mont_to_bytes(buffer, 32, y1, ctx);
     assert(0 == memcmp(buffer, (uint8_t*)"\xb5\x7e\x12\xfc\xdb\x03\x1f\x59\xca\xb8\x1b\x1c\x6b\x1e\x1c\x07\xe4\x51\x2e\x52\xce\x83\x2f\x1a\x0c\xed\xef\xff\x8b\x43\x40\xe9", 32));
+
+    free(x1);
+    free(y1);
+    free(z1);
+    free(x2);
+    free(y2);
+
+    free(b);
+    free_workplace(wp);
+    mont_context_free(ctx);
+}
+
+void test_ec_mix_add_3(void)
+{
+    Workplace *wp;
+    MontContext *ctx;
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint64_t *x1, *y1, *z1;
+    uint64_t *x2, *y2;
+    uint64_t *b;
+    uint8_t buffer[32];
+
+    mont_context_init(&ctx, modulus, sizeof(modulus));
+    wp = new_workplace(ctx);
+    mont_from_bytes(&b, (uint8_t*)"\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b", 32, ctx);
+
+    /* Affine and projective are actually the same point (doubling) */
+    mont_from_bytes(&x1, (uint8_t*)"\xc6\x4c\x90\xad\x8d\x5c\x1d\x96\xd6\x4b\x63\x46\x4a\x8b\x57\x91\xbf\x48\xa6\xb4\xb9\xbc\xd6\xad\x79\xc6\x3a\x13\xbf\xb7\x78\x5b", 32, ctx);
+    mont_from_bytes(&y1, (uint8_t*)"\xe4\x98\x64\xd0\x22\x85\x75\x8a\x11\x79\x68\x2e\x06\x92\x3d\xf7\x62\xa8\x85\xea\xda\xe6\xd9\xb0\x5a\x4f\x0c\x43\x1d\x51\x77\xe4", 32, ctx);
+    mont_from_bytes(&z1, (uint8_t*)"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a", 32, ctx);
+
+    mont_from_bytes(&x2, (uint8_t*)"\xfa\x3a\xdb\x43\xa7\xbc\x69\x5c\xc8\xa1\x23\x87\x07\x74\x55\x8e\x93\x20\xdd\x79\x5f\x5f\xaf\x11\x58\xfa\x39\x01\xf9\x92\x58\xd5", 32, ctx);
+    mont_from_bytes(&y2, (uint8_t*)"\xe3\xa8\xd6\xe0\xd0\x40\x8b\xc1\xce\x8c\x24\x04\x9a\x41\xd2\xff\x23\x77\x40\x98\x49\x17\x15\xc4\xd5\xd4\xb4\x6d\x1c\x88\x25\x96", 32, ctx);
+
+    ec_mix_add(x1, y1, z1, x1, y1, z1, x2, y2, b, wp, ctx);
+
+    mont_to_bytes(buffer, 32, x1, ctx);
+    assert(0 == memcmp(buffer, "\x96\x0f\x82\x08\x3a\x75\xf9\xaf\x9a\xab\x06\x05\x27\x0e\x2d\xa8\xb3\x20\x7e\x8d\xf2\xf0\x00\x4d\xb3\x19\x16\xc9\xea\xc5\x0f\x02", 32));
+    mont_to_bytes(buffer, 32, y1, ctx);
+    assert(0 == memcmp(buffer, "\x20\xe6\xe3\x02\xc6\x57\xfa\x95\x30\x39\xa9\x25\xf1\x9d\xc3\xcb\x0f\x59\xa7\x01\x46\xc8\xac\xe2\x09\x54\x3a\x25\x2a\x18\x96\xba", 32));
+    mont_to_bytes(buffer, 32, z1, ctx);
+    assert(0 == memcmp(buffer, "\xb4\x2f\x0b\xc1\x61\x03\x91\xe4\x11\xf1\x4c\x65\xef\x13\xd4\x57\xb1\x41\xb2\x54\xc3\x86\x08\xea\xc6\x5c\xf1\x61\x9d\x37\x6b\x77", 32));
+
+    free(x1);
+    free(y1);
+    free(z1);
+    free(x2);
+    free(y2);
+
+    free(b);
+    free_workplace(wp);
+    mont_context_free(ctx);
+}
+
+void test_ec_mix_add_4(void)
+{
+    Workplace *wp;
+    MontContext *ctx;
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint64_t *x1, *y1, *z1;
+    uint64_t *x2, *y2;
+    uint64_t *b;
+    uint8_t buffer[32];
+
+    mont_context_init(&ctx, modulus, sizeof(modulus));
+    wp = new_workplace(ctx);
+    mont_from_bytes(&b, (uint8_t*)"\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b", 32, ctx);
 
     /* Affine and projective are actually the same point (doubling) */
     mont_from_bytes(&x1, (uint8_t*)"\xc6\x4c\x90\xad\x8d\x5c\x1d\x96\xd6\x4b\x63\x46\x4a\x8b\x57\x91\xbf\x48\xa6\xb4\xb9\xbc\xd6\xad\x79\xc6\x3a\x13\xbf\xb7\x78\x5b", 32, ctx);
@@ -258,7 +371,10 @@ void test_ec_full_add(void)
 {
     Workplace *wp;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint64_t *x1, *y1, *z1;
     uint64_t *x2, *y2, *z2;
     uint64_t *x3, *y3, *z3;
@@ -364,7 +480,10 @@ void test_ec_scalar(void)
 {
     Workplace *wp1, *wp2;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint64_t *x1, *y1, *z1;
     uint64_t *x2, *y2, *z2;
     uint64_t *b;
@@ -441,9 +560,18 @@ void test_ec_scalar_g_p256(void)
 {
     Workplace *wp1, *wp2;
     MontContext *ctx;
-    const uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
-    const uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    const uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
     uint64_t *b;
     int res;
 
@@ -544,12 +672,30 @@ void test_ec_ws_new_point(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gx_wrong[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x97";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    const uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gx_wrong[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x97};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t zero[32] = { 0 };
 
     res = ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0);
@@ -572,11 +718,11 @@ void test_ec_ws_new_point(void)
     res = ec_ws_new_point(&ecp, Gx, Gy, 32, ec_ctx);
     assert(res == 0);
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     res = ec_ws_new_point(&ecp, zero, zero, 32, ec_ctx);
     assert(res == 0);
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -585,11 +731,26 @@ void test_ec_ws_get_xy(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t bufx[32], bufy[32];
 
     res = ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0);
@@ -614,7 +775,7 @@ void test_ec_ws_get_xy(void)
     assert(0 == memcmp(bufx, Gx, 32));
     assert(0 == memcmp(bufy, Gy, 32));
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -623,11 +784,26 @@ void test_ec_ws_double_p256(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t bufx[32], bufy[32];
 
     ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0);
@@ -642,7 +818,7 @@ void test_ec_ws_double_p256(void)
     assert(0 == memcmp(bufx, "\x7c\xf2\x7b\x18\x8d\x03\x4f\x7e\x8a\x52\x38\x03\x04\xb5\x1a\xc3\xc0\x89\x69\xe2\x77\xf2\x1b\x35\xa6\x0b\x48\xfc\x47\x66\x99\x78", 32));
     assert(0 == memcmp(bufy, "\x07\x77\x55\x10\xdb\x8e\xd0\x40\x29\x3d\x9a\xc6\x9f\x74\x30\xdb\xba\x7d\xad\xe6\x3c\xe9\x82\x29\x9e\x04\xb7\x9d\x22\x78\x73\xd1", 32));
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -651,11 +827,51 @@ void test_ec_ws_double_p521(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Px[66] = "\x01\xD5\xC6\x93\xF6\x6C\x08\xED\x03\xAD\x0F\x03\x1F\x93\x74\x43\x45\x8F\x60\x1F\xD0\x98\xD3\xD0\x22\x7B\x4B\xF6\x28\x73\xAF\x50\x74\x0B\x0B\xB8\x4A\xA1\x57\xFC\x84\x7B\xCF\x8D\xC1\x6A\x8B\x2B\x8B\xFD\x8E\x2D\x0A\x7D\x39\xAF\x04\xB0\x89\x93\x0E\xF6\xDA\xD5\xC1\xB4";
-    uint8_t Py[66] = "\x01\x44\xB7\x77\x09\x63\xC6\x3A\x39\x24\x88\x65\xFF\x36\xB0\x74\x15\x1E\xAC\x33\x54\x9B\x22\x4A\xF5\xC8\x66\x4C\x54\x01\x2B\x81\x8E\xD0\x37\xB2\xB7\xC1\xA6\x3A\xC8\x9E\xBA\xA1\x1E\x07\xDB\x89\xFC\xEE\x5B\x55\x6E\x49\x76\x4E\xE3\xFA\x66\xEA\x7A\xE6\x1A\xC0\x18\x23";
-    uint8_t  b[66] = "\x00\x51\x95\x3E\xB9\x61\x8E\x1C\x9A\x1F\x92\x9A\x21\xA0\xB6\x85\x40\xEE\xA2\xDA\x72\x5B\x99\xB3\x15\xF3\xB8\xB4\x89\x91\x8E\xF1\x09\xE1\x56\x19\x39\x51\xEC\x7E\x93\x7B\x16\x52\xC0\xBD\x3B\xB1\xBF\x07\x35\x73\xDF\x88\x3D\x2C\x34\xF1\xEF\x45\x1F\xD4\x6B\x50\x3F\x00";
-    const uint8_t order[66] = "\x01\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFA\x51\x86\x87\x83\xBF\x2F\x96\x6B\x7F\xCC\x01\x48\xF7\x09\xA5\xD0\x3B\xB5\xC9\xB8\x89\x9C\x47\xAE\xBB\x6F\xB7\x1E\x91\x38\x64\x09";
-    uint8_t modulus[66] = "\x01\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF";
+    const uint8_t Px[66] = {0x01, 0xD5, 0xC6, 0x93, 0xF6, 0x6C, 0x08, 0xED,
+                            0x03, 0xAD, 0x0F, 0x03, 0x1F, 0x93, 0x74, 0x43,
+                            0x45, 0x8F, 0x60, 0x1F, 0xD0, 0x98, 0xD3, 0xD0,
+                            0x22, 0x7B, 0x4B, 0xF6, 0x28, 0x73, 0xAF, 0x50,
+                            0x74, 0x0B, 0x0B, 0xB8, 0x4A, 0xA1, 0x57, 0xFC,
+                            0x84, 0x7B, 0xCF, 0x8D, 0xC1, 0x6A, 0x8B, 0x2B,
+                            0x8B, 0xFD, 0x8E, 0x2D, 0x0A, 0x7D, 0x39, 0xAF,
+                            0x04, 0xB0, 0x89, 0x93, 0x0E, 0xF6, 0xDA, 0xD5,
+                            0xC1, 0xB4};
+    const uint8_t Py[66] = {0x01, 0x44, 0xB7, 0x77, 0x09, 0x63, 0xC6, 0x3A,
+                            0x39, 0x24, 0x88, 0x65, 0xFF, 0x36, 0xB0, 0x74,
+                            0x15, 0x1E, 0xAC, 0x33, 0x54, 0x9B, 0x22, 0x4A,
+                            0xF5, 0xC8, 0x66, 0x4C, 0x54, 0x01, 0x2B, 0x81,
+                            0x8E, 0xD0, 0x37, 0xB2, 0xB7, 0xC1, 0xA6, 0x3A,
+                            0xC8, 0x9E, 0xBA, 0xA1, 0x1E, 0x07, 0xDB, 0x89,
+                            0xFC, 0xEE, 0x5B, 0x55, 0x6E, 0x49, 0x76, 0x4E,
+                            0xE3, 0xFA, 0x66, 0xEA, 0x7A, 0xE6, 0x1A, 0xC0,
+                            0x18, 0x23};
+    const uint8_t b[66] = {0x00, 0x51, 0x95, 0x3E, 0xB9, 0x61, 0x8E, 0x1C,
+                           0x9A, 0x1F, 0x92, 0x9A, 0x21, 0xA0, 0xB6, 0x85,
+                           0x40, 0xEE, 0xA2, 0xDA, 0x72, 0x5B, 0x99, 0xB3,
+                           0x15, 0xF3, 0xB8, 0xB4, 0x89, 0x91, 0x8E, 0xF1,
+                           0x09, 0xE1, 0x56, 0x19, 0x39, 0x51, 0xEC, 0x7E,
+                           0x93, 0x7B, 0x16, 0x52, 0xC0, 0xBD, 0x3B, 0xB1,
+                           0xBF, 0x07, 0x35, 0x73, 0xDF, 0x88, 0x3D, 0x2C,
+                           0x34, 0xF1, 0xEF, 0x45, 0x1F, 0xD4, 0x6B, 0x50,
+                           0x3F, 0x00};
+    const uint8_t order[66] = {0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xFF, 0xFA, 0x51, 0x86, 0x87, 0x83, 0xBF, 0x2F,
+                               0x96, 0x6B, 0x7F, 0xCC, 0x01, 0x48, 0xF7, 0x09,
+                               0xA5, 0xD0, 0x3B, 0xB5, 0xC9, 0xB8, 0x89, 0x9C,
+                               0x47, 0xAE, 0xBB, 0x6F, 0xB7, 0x1E, 0x91, 0x38,
+                               0x64, 0x09};
+    const uint8_t modulus[66] = {0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF};
     uint8_t bufx[66], bufy[66];
 
     ec_ws_new_context(&ec_ctx, modulus, b, order, 66, 0);
@@ -670,7 +886,7 @@ void test_ec_ws_double_p521(void)
     assert(0 == memcmp(bufx, "\x01\x28\x79\x44\x2F\x24\x50\xC1\x19\xE7\x11\x9A\x5F\x73\x8B\xE1\xF1\xEB\xA9\xE9\xD7\xC6\xCF\x41\xB3\x25\xD9\xCE\x6D\x64\x31\x06\xE9\xD6\x11\x24\xA9\x1A\x96\xBC\xF2\x01\x30\x5A\x9D\xEE\x55\xFA\x79\x13\x6D\xC7\x00\x83\x1E\x54\xC3\xCA\x4F\xF2\x64\x6B\xD3\xC3\x6B\xC6", 66));
     assert(0 == memcmp(bufy, "\x01\x98\x64\xA8\xB8\x85\x5C\x24\x79\xCB\xEF\xE3\x75\xAE\x55\x3E\x23\x93\x27\x1E\xD3\x6F\xAD\xFC\x44\x94\xFC\x05\x83\xF6\xBD\x03\x59\x88\x96\xF3\x98\x54\xAB\xEA\xE5\xF9\xA6\x51\x5A\x02\x1E\x2C\x0E\xEF\x13\x9E\x71\xDE\x61\x01\x43\xF5\x33\x82\xF4\x10\x4D\xCC\xB5\x43", 66));
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -679,11 +895,26 @@ void test_ec_ws_add(void)
     EcContext *ec_ctx;
     EcPoint *ecp, *ecp2;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t bufx[32], bufy[32];
 
     ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0);
@@ -702,8 +933,8 @@ void test_ec_ws_add(void)
     assert(0 == memcmp(bufx, "\x5e\xcb\xe4\xd1\xa6\x33\x0a\x44\xc8\xf7\xef\x95\x1d\x4b\xf1\x65\xe6\xc6\xb7\x21\xef\xad\xa9\x85\xfb\x41\x66\x1b\xc6\xe7\xfd\x6c", 32));
     assert(0 == memcmp(bufy, "\x87\x34\x64\x0c\x49\x98\xff\x7e\x37\x4b\x06\xce\x1a\x64\xa2\xec\xd8\x2a\xb0\x36\x38\x4f\xb8\x3d\x9a\x79\xb1\x27\xa2\x7d\x50\x32", 32));
 
-    ec_free_point(ecp);
-    ec_free_point(ecp2);
+    ec_ws_free_point(ecp);
+    ec_ws_free_point(ecp2);
     ec_free_context(ec_ctx);
 }
 
@@ -712,11 +943,26 @@ void test_ec_ws_scalar(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t bufx[32], bufy[32];
 
     ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0x5EED);
@@ -733,7 +979,7 @@ void test_ec_ws_scalar(void)
     assert(0 == memcmp(bufx, "\xf2\x49\x10\x4d\x0e\x6f\x8f\x29\xe6\x01\x62\x77\x78\x0c\xda\x84\xdc\x84\xb8\x3b\xc3\xd8\x99\xdf\xb7\x36\xca\x08\x31\xfb\xe8\xcf", 32));
     assert(0 == memcmp(bufy, "\xb5\x7e\x12\xfc\xdb\x03\x1f\x59\xca\xb8\x1b\x1c\x6b\x1e\x1c\x07\xe4\x51\x2e\x52\xce\x83\x2f\x1a\x0c\xed\xef\xff\x8b\x43\x40\xe9", 32));
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -742,11 +988,26 @@ void test_ec_ws_neg(void)
     EcContext *ec_ctx;
     EcPoint *ecp;
     int res;
-    uint8_t Gx[32] = "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96";
-    uint8_t Gy[32] = "\x4f\xe3\x42\xe2\xfe\x1a\x7f\x9b\x8e\xe7\xeb\x4a\x7c\x0f\x9e\x16\x2b\xce\x33\x57\x6b\x31\x5e\xce\xcb\xb6\x40\x68\x37\xbf\x51\xf5";
-    uint8_t  b[32] = "\x5a\xc6\x35\xd8\xaa\x3a\x93\xe7\xb3\xeb\xbd\x55\x76\x98\x86\xbc\x65\x1d\x06\xb0\xcc\x53\xb0\xf6\x3b\xce\x3c\x3e\x27\xd2\x60\x4b";
-    const uint8_t order[32] = "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xbc\xe6\xfa\xad\xa7\x17\x9e\x84\xf3\xb9\xca\xc2\xfc\x63\x25\x51";
-    uint8_t modulus[32] = "\xff\xff\xff\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
+    const uint8_t Gx[32] = {0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47,
+                            0xF8, 0xBC, 0xE6, 0xE5, 0x63, 0xA4, 0x40, 0xF2,
+                            0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
+                            0xF4, 0xA1, 0x39, 0x45, 0xD8, 0x98, 0xC2, 0x96};
+    const uint8_t Gy[32] = {0x4F, 0xE3, 0x42, 0xE2, 0xFE, 0x1A, 0x7F, 0x9B,
+                            0x8E, 0xE7, 0xEB, 0x4A, 0x7C, 0x0F, 0x9E, 0x16,
+                            0x2B, 0xCE, 0x33, 0x57, 0x6B, 0x31, 0x5E, 0xCE,
+                            0xCB, 0xB6, 0x40, 0x68, 0x37, 0xBF, 0x51, 0xF5};
+    const uint8_t b[32] = {0x5A, 0xC6, 0x35, 0xD8, 0xAA, 0x3A, 0x93, 0xE7,
+                           0xB3, 0xEB, 0xBD, 0x55, 0x76, 0x98, 0x86, 0xBC,
+                           0x65, 0x1D, 0x06, 0xB0, 0xCC, 0x53, 0xB0, 0xF6,
+                           0x3B, 0xCE, 0x3C, 0x3E, 0x27, 0xD2, 0x60, 0x4B};
+    const uint8_t order[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xBC, 0xE6, 0xFA, 0xAD, 0xA7, 0x17, 0x9E, 0x84,
+                               0xF3, 0xB9, 0xCA, 0xC2, 0xFC, 0x63, 0x25, 0x51};
+    const uint8_t modulus[32] = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t bufx[32], bufy[32];
 
     ec_ws_new_context(&ec_ctx, modulus, b, order, 32, 0);
@@ -761,7 +1022,7 @@ void test_ec_ws_neg(void)
     assert(0 == memcmp(bufx, "\x6b\x17\xd1\xf2\xe1\x2c\x42\x47\xf8\xbc\xe6\xe5\x63\xa4\x40\xf2\x77\x03\x7d\x81\x2d\xeb\x33\xa0\xf4\xa1\x39\x45\xd8\x98\xc2\x96", 32));
     assert(0 == memcmp(bufy, "\xb0\x1c\xbd\x1c\x01\xe5\x80\x65\x71\x18\x14\xb5\x83\xf0\x61\xe9\xd4\x31\xcc\xa9\x94\xce\xa1\x31\x34\x49\xbf\x97\xc8\x40\xae\x0a", 32));
 
-    ec_free_point(ecp);
+    ec_ws_free_point(ecp);
     ec_free_context(ec_ctx);
 }
 
@@ -769,7 +1030,10 @@ void test_ec_ws_neg(void)
 int main(void) {
     test_ec_projective_to_affine();
     test_ec_full_double();
-    test_ec_mix_add();
+    test_ec_mix_add_1();
+    test_ec_mix_add_2();
+    test_ec_mix_add_3();
+    test_ec_mix_add_4();
     test_ec_full_add();
     test_ec_scalar();
     test_ec_scalar_g_p256();

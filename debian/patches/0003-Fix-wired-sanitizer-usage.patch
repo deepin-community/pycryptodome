@@ -1,0 +1,22 @@
+From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
+Date: Fri, 2 Aug 2024 00:46:58 +0900
+Subject: Fix wired sanitizer usage
+
+---
+ src/test/CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/test/CMakeLists.txt b/src/test/CMakeLists.txt
+index 81f126f..27ce373 100644
+--- a/src/test/CMakeLists.txt
++++ b/src/test/CMakeLists.txt
+@@ -54,8 +54,7 @@ else()
+ 	endif()
+     endif()
+     add_compile_options(-fsanitize=undefined -fsanitize=address)
+-    link_libraries(-lubsan)
+-    add_link_options(-fsanitize=address)
++    add_link_options(-fsanitize=undefined -fsanitize=address)
+ endif()
+ 
+ if (CMAKE_SIZEOF_VOID_P EQUAL 8)

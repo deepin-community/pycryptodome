@@ -9,10 +9,10 @@ display math; imgmath generates static images.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Doc/conf.py b/Doc/conf.py
-index a0fe440..a943372 100644
+index 27466ff..e4b62cb 100644
 --- a/Doc/conf.py
 +++ b/Doc/conf.py
-@@ -45,7 +45,7 @@ _raw_api.load_pycryptodome_raw_lib = lambda name, cdec: MockLib()
+@@ -52,7 +52,7 @@ _raw_api.load_pycryptodome_raw_lib = lambda name, cdec: MockLib()
  # Add any Sphinx extension module names here, as strings. They can be extensions
  # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
  extensions = [ 'sphinx.ext.autodoc', 'sphinx.ext.napoleon',

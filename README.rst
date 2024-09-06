@@ -1,6 +1,12 @@
 .. image:: https://github.com/Legrandin/pycryptodome/workflows/Integration%20test/badge.svg?branch=master
    :target: https://github.com/Legrandin/pycryptodome/actions
 
+.. image:: https://badge.fury.io/py/pycryptodome.svg
+   :target: https://pypi.org/project/pycryptodome
+
+.. image:: https://badge.fury.io/py/pycryptodomex.svg
+   :target: https://pypi.org/project/pycryptodomex
+
 PyCryptodome
 ============
 
@@ -41,16 +47,25 @@ with respect to the last official version of PyCrypto (2.6.1):
 * Authenticated encryption modes (GCM, CCM, EAX, SIV, OCB)
 * Accelerated AES on Intel platforms via AES-NI
 * First class support for PyPy
-* Elliptic curves cryptography (NIST P-256, P-384 and P-521 curves only)
+* Elliptic curves cryptography (NIST P-curves; Ed25519, Ed448)
 * Better and more compact API (`nonce` and `iv` attributes for ciphers,
   automatic generation of random nonces and IVs, simplified CTR cipher mode,
   and more)
-* SHA-3 (including SHAKE and cSHAKE XOFs), truncated SHA-512 and BLAKE2 hash algorithms
+* SHA-3 hash algorithms (FIPS 202) and derived functions (NIST SP-800 185):
+
+  - SHAKE128 and SHA256 XOFs
+  - cSHAKE128 and cSHAKE256 XOFs
+  - KMAC128 and KMAC256
+  - TupleHash128 and TupleHash256
+
+* KangarooTwelve, TurboSHAKE128, and TurboSHAKE256 XOFs
+* Truncated hash algorithms SHA-512/224 and SHA-512/256 (FIPS 180-4)
+* BLAKE2b and BLAKE2s hash algorithms
 * Salsa20 and ChaCha20/XChaCha20 stream ciphers
 * Poly1305 MAC
 * ChaCha20-Poly1305 and XChaCha20-Poly1305 authenticated ciphers
-* scrypt, bcrypt and HKDF derivation functions
-* Deterministic (EC)DSA
+* scrypt, bcrypt, HKDF, and NIST SP 800 108r1 Counter Mode key derivation functions
+* Deterministic (EC)DSA and EdDSA
 * Password-protected PKCS#8 key containers
 * Shamir's Secret Sharing scheme
 * Random numbers get sourced directly from the OS (and not from a CSPRNG in userspace)
