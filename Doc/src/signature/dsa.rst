@@ -1,10 +1,11 @@
 Digital Signature Algorithm (DSA and ECDSA)
 ===========================================
 
-A variant of the ElGamal signature, specified in `FIPS PUB 186-4`__.
+DSA and ECDSA are U.S. federal standards for digital signatures, specified in `FIPS PUB 186-4`__.
 
-It is based on the discrete logarithm problem in a prime finite field (DSA) or
-in an elliptic curve field (ECDSA).
+Their security relies on the discrete logarithm problem in a prime finite field (the original DSA,
+now deprecated) or in an elliptic curve field (ECDSA, faster and with smaller keys,
+to be used in new applications).
 
 A sender can use a *private* key (loaded from a file) to sign a message::
 
@@ -29,9 +30,9 @@ The receiver can use the matching *public* key to verify authenticity of the rec
         >>> verifier = DSS.new(key, 'fips-186-3')
         >>> try:
         >>>     verifier.verify(h, signature)
-        >>>     print "The message is authentic."
+        >>>     print("The message is authentic.")
         >>> except ValueError:
-        >>>     print "The message is not authentic."
+        >>>     print("The message is not authentic.")
 
 .. __: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 

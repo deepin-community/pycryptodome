@@ -88,19 +88,21 @@ Every hash object has the following attributes:
 Modern hash algorithms
 ----------------------
 
-- SHA-2 family
+- SHA-2 family (FIPS 180-4)
 
     - :doc:`sha224`
     - :doc:`sha256`
     - :doc:`sha384`
     - :doc:`sha512`
 
-- SHA-3 family
+- SHA-3 family (FIPS 202)
 
     - :doc:`sha3_224`
     - :doc:`sha3_256`
     - :doc:`sha3_384`
     - :doc:`sha3_512`
+    - :doc:`tuplehash128`
+    - :doc:`tuplehash256`
 
 - BLAKE2
 
@@ -110,12 +112,33 @@ Modern hash algorithms
 Extensible-Output Functions (XOF)
 ---------------------------------
 
-- SHAKE and cSHAKE (in the SHA-3 family)
+A XOF is similar to a conventional cryptographic hash: it is
+a one-way function that maps a piece of data of arbitrary size to
+a random-like output. It provides some guarantees over
+collision resistance, pre-image resistance, and second pre-image resistance.
+
+Unlike a conventional hash, an application using a XOF can choose the length of the output.
+For this reason, a XOF does not have a ``digest()`` method.
+Instead, it has a ``read(N)`` method to extract the next ``N`` bytes of the output.
+
+ .. figure:: xof.png
+    :align: center
+    :figwidth: 50%
+
+    Generic state diagram for a XOF object
+
+- SHA-3 family (FIPS 202)
 
     - :doc:`shake128`
     - :doc:`shake256`
+
+- SHA-3 derived functions (NIST SP 800-185)
+
     - :doc:`cshake128`
     - :doc:`cshake256`
+
+- :doc:`k12`
+- :doc:`turboshake`
 
 Message Authentication Code (MAC) algorithms
 --------------------------------------------
@@ -123,6 +146,11 @@ Message Authentication Code (MAC) algorithms
 - :doc:`hmac`
 - :doc:`cmac`
 - :doc:`poly1305`
+
+- SHA-3 derived functions (NIST SP 800-185)
+
+    - :doc:`kmac128`
+    - :doc:`kmac256`
 
 Historic hash algorithms
 -------------------------

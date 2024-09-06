@@ -1,0 +1,29 @@
+From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
+Date: Fri, 2 Aug 2024 08:28:29 +0900
+Subject: Some architecture requires additional library (Closes: #1069534)
+
+Bug-Debian: https://bugs.debian.org/1069534
+
+* __atomic_compare_exchange_8
+* __atomic_load_8
+* __atomic_store_8
+
+See also:
+Bug 81358 - libatomic not automatically linked with C11 code
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81358
+---
+ src/test/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/CMakeLists.txt b/src/test/CMakeLists.txt
+index 27ce373..afff2c4 100644
+--- a/src/test/CMakeLists.txt
++++ b/src/test/CMakeLists.txt
+@@ -55,6 +55,7 @@ else()
+     endif()
+     add_compile_options(-fsanitize=undefined -fsanitize=address)
+     add_link_options(-fsanitize=undefined -fsanitize=address)
++    link_libraries(-latomic)
+ endif()
+ 
+ if (CMAKE_SIZEOF_VOID_P EQUAL 8)

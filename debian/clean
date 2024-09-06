@@ -1,3 +1,8 @@
 *.egg-info/*
 .separate_namespace
 lib/Cryptodome/
+src/test/CMakeFiles/
+src/test/CMakeCache.txt
+src/test/CTestTestfile.cmake
+src/test/Makefile
+src/test/cmake_install.cmake

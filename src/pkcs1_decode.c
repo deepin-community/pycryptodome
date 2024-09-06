@@ -38,7 +38,7 @@ FAKE_INIT(pkcs1_decode)
 
 STATIC uint8_t rol8(uint8_t x)
 {
-    return (x << 1) | (x >> 7);
+    return (uint8_t)((x << 1) | (x >> 7));
 }
 
 /*
@@ -76,7 +76,7 @@ STATIC void set_if_match(uint8_t *flag, size_t term1, size_t term2)
     for (i=0; i<sizeof(size_t); i++) {
         x |= (uint8_t)((term1 ^ term2) >> (i*8));
     }
-    *flag |= ~propagate_ones(x);
+    *flag |= (uint8_t)~propagate_ones(x);
 }
 
 /*
@@ -92,7 +92,7 @@ STATIC void set_if_no_match(uint8_t *flag, size_t term1, size_t term2)
     for (i=0; i<sizeof(size_t); i++) {
         x |= (uint8_t)((term1 ^ term2) >> (i*8));
     }
-    *flag |= propagate_ones(x);
+    *flag |= (uint8_t)propagate_ones(x);
 }
 
 /*
@@ -103,8 +103,8 @@ STATIC void safe_select(const uint8_t *in1, const uint8_t *in2, uint8_t *out, ui
     size_t i;
     uint8_t mask1, mask2;
 
-    mask1 = propagate_ones(choice);
-    mask2 = ~mask1;
+    mask1 = (uint8_t)propagate_ones(choice);
+    mask2 = (uint8_t)~mask1;
     for (i=0; i<len; i++) {
         out[i] = (in1[i] & mask2) | (in2[i] & mask1);
         /* yes, these rol8s are redundant, but we try to avoid compiler optimizations */
@@ -130,7 +130,7 @@ STATIC size_t safe_select_idx(size_t in1, size_t in2, uint8_t choice)
  *  - in1[] is NOT equal to in2[] where neq_mask[] is 0xFF.
  * Return non-zero otherwise.
  */
-STATIC uint8_t safe_cmp(const uint8_t *in1, const uint8_t *in2,
+STATIC uint8_t safe_cmp_masks(const uint8_t *in1, const uint8_t *in2,
                  const uint8_t *eq_mask, const uint8_t *neq_mask,
                  size_t len)
 {
@@ -139,11 +139,11 @@ STATIC uint8_t safe_cmp(const uint8_t *in1, const uint8_t *in2,
 
     result = 0;
     for (i=0; i<len; i++) {
-        c = propagate_ones(*in1++ ^ *in2++);
-        result |= c & *eq_mask++;   /* Set all bits to 1 if *in1 and *in2 differed
-                                       and eq_mask was 0xff */
-        result |= ~c & *neq_mask++; /* Set all bits to 1 if *in1 and *in2 matched
-                                       and neq_mask was 0xff */
+        c = (uint8_t)propagate_ones(*in1++ ^ *in2++);
+        result |= (uint8_t)(c & *eq_mask++);    /* Set all bits to 1 if *in1 and *in2 differed
+                                                and eq_mask was 0xff */
+        result |= (uint8_t)(~c & *neq_mask++);  /* Set all bits to 1 if *in1 and *in2 matched
+                                                and neq_mask was 0xff */
     }
 
     return result;
@@ -187,7 +187,7 @@ STATIC size_t safe_search(const uint8_t *in1, uint8_t c, size_t len)
     return result;
 }
 
-#define EM_PREFIX_LEN 10
+#define PKCS1_PREFIX_LEN 10
 
 /*
  * Decode and verify the PKCS#1 padding, then put either the plaintext
@@ -222,13 +222,13 @@ EXPORT_SYM int pkcs1_decode(const uint8_t *em, size_t len_em_output,
     if (NULL == em || NULL == output || NULL == sentinel) {
         return -1;
     }
-    if (len_em_output < (EM_PREFIX_LEN + 2)) {
+    if (len_em_output < (PKCS1_PREFIX_LEN + 2)) {
         return -1;
     }
     if (len_sentinel > len_em_output) {
         return -1;
     }
-    if (expected_pt_len > 0 && expected_pt_len > (len_em_output - EM_PREFIX_LEN - 1)) {
+    if (expected_pt_len > 0 && expected_pt_len > (len_em_output - PKCS1_PREFIX_LEN - 1)) {
         return -1;
     }
 
@@ -240,7 +240,7 @@ EXPORT_SYM int pkcs1_decode(const uint8_t *em, size_t len_em_output,
     memcpy(padded_sentinel + (len_em_output - len_sentinel), sentinel, len_sentinel);
 
     /** The first 10 bytes must follow the pattern **/
-    match = safe_cmp(em,
+    match = safe_cmp_masks(em,
                      (const uint8_t*)"\x00\x02" "\x00\x00\x00\x00\x00\x00\x00\x00",
                      (const uint8_t*)"\xFF\xFF" "\x00\x00\x00\x00\x00\x00\x00\x00",
                      (const uint8_t*)"\x00\x00" "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
@@ -277,9 +277,78 @@ EXPORT_SYM int pkcs1_decode(const uint8_t *em, size_t len_em_output,
     safe_select(em, padded_sentinel, output, selector, len_em_output);
 
     /** Select the number of bytes that the caller will skip in output **/
-    result = safe_select_idx(pos + 1, len_em_output - len_sentinel, selector);
+    result = (int)safe_select_idx(pos + 1, len_em_output - len_sentinel, selector);
 
 end:
     free(padded_sentinel);
+    return result;
+}
+
+/*
+ * Decode and verify the OAEP padding in constant time.
+ *
+ * The function returns the number of bytes to ignore at the beginning
+ * of db (the rest is the plaintext), or -1 in case of problems.
+ */
+
+EXPORT_SYM int oaep_decode(const uint8_t *em,
+                           size_t em_len,
+                           const uint8_t *lHash,
+                           size_t hLen,
+                           const uint8_t *db,
+                           size_t db_len)   /* em_len - 1 - hLen */
+{
+    int result;
+    size_t one_pos, search_len, i;
+    uint8_t wrong_padding;
+    uint8_t *eq_mask = NULL;
+    uint8_t *neq_mask = NULL;
+    uint8_t *target_db = NULL;
+
+    if (NULL == em || NULL == lHash || NULL == db) {
+        return -1;
+    }
+
+    if (em_len < 2*hLen+2 || db_len != em_len-1-hLen) {
+        return -1;
+    }
+
+    /* Allocate */
+    eq_mask = (uint8_t*) calloc(1, db_len);
+    neq_mask = (uint8_t*) calloc(1, db_len);
+    target_db = (uint8_t*) calloc(1, db_len);
+    if (NULL == eq_mask || NULL == neq_mask || NULL == target_db) {
+        result = -1;
+        goto cleanup;
+    }
+
+    /* Step 3g */
+    search_len = db_len - hLen;
+
+    one_pos = safe_search(db + hLen, 0x01, search_len);
+    if (SIZE_T_MAX == one_pos) {
+        result = -1;
+        goto cleanup;
+    }
+
+    memset(eq_mask, 0xAA, db_len);
+    memcpy(target_db, lHash, hLen);
+    memset(eq_mask, 0xFF, hLen);
+
+    for (i=0; i<search_len; i++) {
+        eq_mask[hLen + i] = propagate_ones(i < one_pos);
+    }
+
+    wrong_padding = em[0];
+    wrong_padding |= safe_cmp_masks(db, target_db, eq_mask, neq_mask, db_len);
+    set_if_match(&wrong_padding, one_pos, search_len);
+
+    result = wrong_padding ? -1 : (int)(hLen + 1 + one_pos);
+
+cleanup:
+    free(eq_mask);
+    free(neq_mask);
+    free(target_db);
+
     return result;
 }

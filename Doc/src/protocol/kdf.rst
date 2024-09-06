@@ -104,6 +104,8 @@ and to check them::
 .. autofunction:: Crypto.Protocol.KDF.bcrypt
 .. autofunction:: Crypto.Protocol.KDF.bcrypt_check
 
+.. _hkdf:
+
 HKDF
 +++++
 
@@ -122,6 +124,51 @@ Example, for deriving two AES256 keys::
     key1, key2 = HKDF(master_secret, 32, salt, SHA512, 2)
 
 .. autofunction:: Crypto.Protocol.KDF.HKDF
+
+.. _sp800-180-counter:
+
+SP 800-180 Counter Mode
+++++++++++++++++++++++++
+
+A KDF can be generically constructed with a pseudorandom function (PRF).
+If the PRF has a fixed-length output,
+you can evaluate the PRF multiple times and concatenate the results until you collect enough derived keying material.
+
+This function implements such type of KDF, where a counter contributes to each invokation of the PRF, as defined in
+`NIST SP 800-108 Rev 1 <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-108r1.pdf>`_.
+The NIST standard only allows the use of HMAC (recommended) and CMAC (not recommended) as PRF.
+
+This KDF is not suitable for deriving keys from a password.
+
+Example 1 (HMAC as PRF, one AES128 key to derive)::
+
+    >> from Crypto.Hash import SHA256, HMAC
+    >>
+    >> def prf(s, x):
+    >>     return HMAC.new(s, x, SHA256).digest()
+    >>
+    >> key_derived = SP800_108_Counter(secret, 16, prf, label=b'Key A')
+
+Example 2 (HMAC as PRF, two AES128 keys to derive)::
+
+    >> from Crypto.Hash import SHA256, HMAC
+    >>
+    >> def prf(s, x):
+    >>     return HMAC.new(s, x, SHA256).digest()
+    >>
+    >> key_A, key_B = SP800_108_Counter(secret, 16, prf, num_keys=2, label=b'Key AB')
+
+Example 3 (CMAC as PRF, two AES256 keys to derive)::
+
+    >> from Crypto.Cipher import AES
+    >> from Crypto.Hash import SHA256, CMAC
+    >>
+    >> def prf(s, x):
+    >>     return CMAC.new(s, x, AES).digest()
+    >>
+    >> key_A, key_B = SP800_108_Counter(secret, 32, prf, num_keys=2, label=b'Key AB')
+
+.. autofunction:: Crypto.Protocol.KDF.SP800_108_Counter
 
 PBKDF1
 +++++++
